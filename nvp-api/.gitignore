@@ -39,4 +39,3 @@ out/
 ### 추가 ###
 application.yml
 .env
-docker-compose.yml
