@@ -1,0 +1,20 @@
+
+services:
+#  nvp-api:
+#    image: dlacofbs/nvp-api:latest
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
+  postgres:
+    image: postgres:latset
+    environment:
+      POSTGRES_USER: ${POSTGRES_ROOT_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+    volumes:
+      - nvp_pg_data:/var/lib/postgresql/data
+
+volumes:
+  nvp_pg_data:
+    driver: local
