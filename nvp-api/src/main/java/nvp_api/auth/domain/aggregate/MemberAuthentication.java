@@ -1,7 +1,9 @@
-package nvp_api.user.domain.aggregate;
+package nvp_api.auth.domain.aggregate;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import nvp_api.member.domain.aggregate.MemberUser;
 
 import java.time.LocalDate;
 
@@ -12,6 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @Table(name = "member_authentications")
+@NoArgsConstructor
 public class MemberAuthentication {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +30,7 @@ public class MemberAuthentication {
     @Column(nullable = false)
     private String name;                                // 이름
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(nullable = false, name = "user_no")
     private MemberUser memberUser;
 
@@ -37,5 +40,13 @@ public class MemberAuthentication {
         if (isPublic == null) {
             isPublic = true;
         }
+    }
+
+    // 이메일 가입 생성자
+    public MemberAuthentication(Boolean isPublic, LocalDate birthday, String name, MemberUser memberUser) {
+        this.isPublic = isPublic;
+        this.birthday = birthday;
+        this.name = name;
+        this.memberUser = memberUser;
     }
 }
