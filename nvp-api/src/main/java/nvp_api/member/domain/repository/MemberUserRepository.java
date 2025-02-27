@@ -1,0 +1,42 @@
+package nvp_api.member.domain.repository;
+
+import nvp_api.member.domain.aggregate.MemberUser;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface MemberUserRepository {
+
+    /**
+     * ======================= 저장 ======================= //
+     */
+
+    // 저장
+    Optional<MemberUser> save(MemberUser memberUser);
+
+    // 전체 저장
+    List<MemberUser> saveAll(List<MemberUser> memberUsers);
+
+    /**
+     * ======================= 조회 ======================= //
+      */
+
+    // 모두 찾기
+    List<MemberUser> findAll();
+
+    // userId로 찾기
+    Optional<MemberUser> findByUserId(String userId);
+
+    // 로그인 타입별 모두 찾기
+    List<MemberUser> findByLoginType(MemberUser.LoginType loginType);
+
+    /**
+     * ======================= 삭제 ======================= //
+     */
+
+    // 삭제
+    void delete(MemberUser memberUser);
+
+    // 전체 삭제
+    void deleteAll(List<MemberUser> memberUsers);
+}
