@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import nvp_api.auth.application.dto.LoginMemberDTO;
 import nvp_api.common.jwt.TokenDTO;
 import nvp_api.common.jwt.TokenProvider;
+import nvp_api.member.domain.aggregate.BlackList;
+import nvp_api.member.infrastructure.repository.CrudBlackListRepository;
 import nvp_api.security.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +25,7 @@ public class AuthService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
+    private final CrudBlackListRepository blackListRepository;
 
     // 일반 로그인
     public TokenDTO memberLogin(LoginMemberDTO loginMemberDTO){
@@ -46,5 +49,15 @@ public class AuthService {
         tokenDTO.setUserRole(userRole);
 
         return tokenDTO;
+    }
+
+    // 로그아웃
+    public void memberLogout(String userId, String accessToken){
+        BlackList build = BlackList.builder()
+                .accessToken(accessToken)
+                .userId(userId)
+                .build();
+
+        blackListRepository.save(build);
     }
 }

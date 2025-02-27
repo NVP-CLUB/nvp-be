@@ -9,6 +9,7 @@ import nvp_api.common.response.ApiResponse;
 import nvp_api.auth.application.dto.LoginMemberDTO;
 import nvp_api.auth.application.dto.RegisterMemberDTO;
 import nvp_api.member.application.service.MemberService;
+import nvp_api.security.SecurityUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,5 +27,14 @@ public class AuthController {
     public ResponseEntity<ApiResponse<TokenDTO>> loginMember(@RequestBody @Valid LoginMemberDTO loginMemberDTO){
 
         return ApiResponse.success(authService.memberLogin(loginMemberDTO));
+    }
+
+    // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logoutMember(@RequestHeader(name = "Authorization") String accessToken){
+
+        authService.memberLogout(SecurityUtil.getCurrentUserId(), accessToken);
+
+        return ApiResponse.success(SecurityUtil.getCurrentUserId());
     }
 }
