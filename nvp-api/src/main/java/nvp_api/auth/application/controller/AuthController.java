@@ -3,6 +3,8 @@ package nvp_api.auth.application.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nvp_api.auth.application.service.AuthService;
+import nvp_api.common.jwt.TokenDTO;
 import nvp_api.common.response.ApiResponse;
 import nvp_api.auth.application.dto.LoginMemberDTO;
 import nvp_api.auth.application.dto.RegisterMemberDTO;
@@ -11,26 +13,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/auth")
 @Slf4j
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final MemberService memberService;
+    private final AuthService authService;
 
-    // 일반 회원가입
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String>> registerMember(@RequestBody @Valid RegisterMemberDTO registerMemberDTO){
-
-        String userId = memberService.registerMemberUser(registerMemberDTO);
-
-        return ApiResponse.create(userId);
-    }
 
     // 일반 로그인
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<?>> loginMember(@RequestBody @Valid LoginMemberDTO loginMemberDTO){
+    public ResponseEntity<ApiResponse<TokenDTO>> loginMember(@RequestBody @Valid LoginMemberDTO loginMemberDTO){
 
-
+        return ApiResponse.success(authService.memberLogin(loginMemberDTO));
     }
 }

@@ -2,22 +2,20 @@ package nvp_api.member.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nvp_api.common.exception.CustomException;
-import nvp_api.common.exception.ErrorCode;
-import nvp_api.auth.application.dto.LoginMemberDTO;
 import nvp_api.auth.application.dto.RegisterMemberDTO;
 import nvp_api.auth.domain.aggregate.AuthPassword;
 import nvp_api.auth.domain.aggregate.MemberAuthentication;
-import nvp_api.security.CustomUserDetails;
+import nvp_api.auth.infrastructure.repository.JpaAuthPasswordRepository;
+import nvp_api.auth.infrastructure.repository.JpaMemberAuthenticationRepository;
+import nvp_api.common.exception.CustomException;
+import nvp_api.common.exception.ErrorCode;
 import nvp_api.member.domain.aggregate.MemberProfile;
 import nvp_api.member.domain.aggregate.MemberRole;
 import nvp_api.member.domain.aggregate.MemberUser;
-import nvp_api.auth.infrastructure.repository.JpaAuthPasswordRepository;
-import nvp_api.auth.infrastructure.repository.JpaMemberAuthenticationRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberProfileRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberRoleRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberUserRepository;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import nvp_api.security.CustomUserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,10 +60,13 @@ public class MemberService {
         memberUserRepository.findByUserId(registerMemberDTO.getUserId())
                 .ifPresent(user -> {
                     if (user.getLoginType() == MemberUser.LoginType.KAKAO){
+                        // 카카오 중복 가입
                         throw new CustomException(ErrorCode.CONFLICT_USERID_KAKAO);
                     } else if (user.getLoginType() == MemberUser.LoginType.GOOGLE) {
+                        // 구글 중복 가입
                         throw new CustomException(ErrorCode.CONFLICT_USERID_GOOGLE);
                     } else {
+                        // 일반 회원 중복 가입
                         throw new CustomException(ErrorCode.CONFLICT_USERID_EMAIL);
                     }
                 });

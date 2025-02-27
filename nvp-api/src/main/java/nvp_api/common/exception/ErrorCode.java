@@ -19,7 +19,14 @@ public enum ErrorCode {
      */
     // 사용자 (Member)
     NEED_LOGIN(40100, HttpStatus.UNAUTHORIZED, "로그인이 필요한 서비스입니다."),
+    EXPIRED_TOKEN(40101, HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    INVALID_TOKEN(40102, HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
 
+    // JWT 관련 (Token)
+    INVALID_JWT_SIGNATURE(40110, HttpStatus.UNAUTHORIZED, "잘못된 JWT 서명입니다."),
+    MALFORMED_JWT_TOKEN(40111, HttpStatus.UNAUTHORIZED, "잘못된 JWT 토큰 형식입니다."),
+    UNSUPPORTED_JWT_TOKEN(40112, HttpStatus.BAD_REQUEST, "지원되지 않는 JWT 토큰입니다."),
+    EMPTY_JWT_CLAIMS(40113, HttpStatus.BAD_REQUEST, "JWT 클레임이 없습니다."),
 
     /**
      *  FORBIDDEN 403xx
@@ -44,10 +51,9 @@ public enum ErrorCode {
      *  INTERNAL_SERVER_ERROR 500xx
      *  -> 서버 오류
      */
-    // 사용자
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "가입 중 오류가 발생했습니다.");
 
     private final int code;                 // 서비스 자체 오류 코드
     private final HttpStatus httpStatus;    // 해당 HttpStatus
-    private final String message;           // 오류 메세지
+    private final String message;           // 오류 메시지
 }
