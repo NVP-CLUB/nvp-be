@@ -30,6 +30,9 @@ public class MemberAuthentication {
     @Column(nullable = false)
     private String name;                                // 이름
 
+    @Column(nullable = false, name = "is_male")
+    private Boolean isMale;                             // 성별
+
     @OneToOne
     @JoinColumn(nullable = false, name = "user_no")
     private MemberUser memberUser;
@@ -43,10 +46,11 @@ public class MemberAuthentication {
     }
 
     // 이메일 가입 생성자
-    public MemberAuthentication(Boolean isPublic, LocalDate birthday, String name, MemberUser memberUser) {
+    public MemberAuthentication(Boolean isPublic, LocalDate birthday, String name, MemberUser memberUser, Boolean isMale) {
         this.isPublic = isPublic;
         this.birthday = birthday;
         this.name = name;
         this.memberUser = memberUser;
+        this.isMale = isMale;
     }
 }

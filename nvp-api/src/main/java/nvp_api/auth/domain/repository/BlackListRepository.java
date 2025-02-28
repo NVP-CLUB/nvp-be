@@ -1,17 +1,10 @@
-package nvp_api.member.domain.repository;
+package nvp_api.auth.domain.repository;
 
-import nvp_api.member.domain.aggregate.BlackList;
+import nvp_api.auth.domain.aggregate.BlackList;
 
 import java.util.Optional;
 
 public interface BlackListRepository {
-
-    /**
-     * ======================= 저장 ======================= //
-     */
-    
-    // 블랙리스트 등록
-    Optional<BlackList> save(BlackList blackList);
 
     /**
      * ======================= 조회 ======================= //

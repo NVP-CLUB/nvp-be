@@ -3,7 +3,7 @@ package nvp_api.member.application.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nvp_api.auth.application.dto.RegisterMemberDTO;
+import nvp_api.member.application.dto.RegisterMemberDTO;
 import nvp_api.common.response.ApiResponse;
 import nvp_api.member.application.service.MemberService;
 import org.springframework.http.ResponseEntity;

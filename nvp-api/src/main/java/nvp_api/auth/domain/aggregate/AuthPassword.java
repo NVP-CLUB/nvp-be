@@ -3,6 +3,7 @@ package nvp_api.auth.domain.aggregate;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nvp_api.common.aggregate.entity.UpdateTimeEntity;
 import nvp_api.member.domain.aggregate.MemberUser;
 
 /**
@@ -13,7 +14,7 @@ import nvp_api.member.domain.aggregate.MemberUser;
 @Entity
 @Table(name = "auth_passwords")
 @NoArgsConstructor
-public class AuthPassword {
+public class AuthPassword extends UpdateTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long passwordId;

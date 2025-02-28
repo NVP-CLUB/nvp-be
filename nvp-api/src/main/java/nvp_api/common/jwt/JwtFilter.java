@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nvp_api.common.exception.CustomException;
 import nvp_api.common.exception.ErrorCode;
-import nvp_api.member.infrastructure.repository.CrudBlackListRepository;
+import nvp_api.auth.infrastructure.repository.CrudBlackListRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;

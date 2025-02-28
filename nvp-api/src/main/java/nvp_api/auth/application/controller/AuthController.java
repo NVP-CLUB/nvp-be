@@ -7,8 +7,6 @@ import nvp_api.auth.application.service.AuthService;
 import nvp_api.common.jwt.TokenDTO;
 import nvp_api.common.response.ApiResponse;
 import nvp_api.auth.application.dto.LoginMemberDTO;
-import nvp_api.auth.application.dto.RegisterMemberDTO;
-import nvp_api.member.application.service.MemberService;
 import nvp_api.security.SecurityUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

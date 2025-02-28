@@ -1,22 +1,13 @@
 package nvp_api.member.domain.repository;
 
 import nvp_api.member.domain.aggregate.MemberProfile;
+import nvp_api.member.domain.aggregate.MemberUser;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface MemberProfileRepository {
-
-    /**
-     * ======================= 저장 ======================= //
-     */
-
-    // 저장
-    Optional<MemberProfile> save(MemberProfile memberProfile);
-
-    // 모두 저장
-    List<MemberProfile> saveAll(List<MemberProfile> memberProfiles);
 
     /**
      * ======================= 조회 ======================= //
@@ -29,7 +20,7 @@ public interface MemberProfileRepository {
     Optional<MemberProfile> findByProfileId(long id);
 
     // 사용자 고유 번호로 찾기 (member_user_no)
-    Optional<MemberProfile> findByUserNo(long userNo);
+    Optional<MemberProfile> findByMemberUser(MemberUser memberUser);
 
     // 등번호로 찾기
     List<MemberProfile> findAllByMemberNo(int memberNo);
@@ -44,6 +35,4 @@ public interface MemberProfileRepository {
     // 삭제
     void delete(MemberProfile memberProfile);
 
-    // 전부 삭제
-    void deleteAll(List<MemberProfile> memberProfiles);
 }
