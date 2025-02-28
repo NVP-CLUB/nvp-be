@@ -3,6 +3,8 @@ package nvp_api.auth.application.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nvp_api.auth.application.dto.LoginMemberDTO;
+import nvp_api.auth.domain.aggregate.RefreshToken;
+import nvp_api.auth.infrastructure.repository.CrudRefreshTokenRepository;
 import nvp_api.common.jwt.TokenDTO;
 import nvp_api.common.jwt.TokenProvider;
 import nvp_api.auth.domain.aggregate.BlackList;
@@ -25,6 +27,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
     private final CrudBlackListRepository blackListRepository;
+    private final CrudRefreshTokenRepository refreshTokenRepository;
 
     // 일반 로그인
     public TokenDTO memberLogin(LoginMemberDTO loginMemberDTO){
@@ -44,6 +47,14 @@ public class AuthService {
         List<String> userRole = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+
+        // RefreshToken 저장소에 저장
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                .refreshToken(tokenDTO.getRefreshToken())
+                .userId(loginMemberDTO.getUserId())
+                .build()
+        );
 
         tokenDTO.setUserRole(userRole);
 

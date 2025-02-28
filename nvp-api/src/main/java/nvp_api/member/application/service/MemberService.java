@@ -38,9 +38,18 @@ public class MemberService {
 
     // CustomUserDetailsService에서의 SRP를 지키기 위해 UserService로 분리
     public CustomUserDetails loadUserByUsername(String userId) throws UsernameNotFoundException{
-        // 사용자 정보 가져오기
+        // 사용자 가져오기
         MemberUser memberUser = memberUserRepository.findByUserId(userId)
                 .orElseThrow(() -> new UsernameNotFoundException(userId));
+
+        if (memberUser.getStatus().equals(MemberUser.UserStatus.DELETED)){
+            // 탈퇴된 회원인 경우
+            throw new CustomException(ErrorCode.DELETED_USER);
+
+        } else if (memberUser.getStatus().equals(MemberUser.UserStatus.SUSPENDED)){
+            // 정지된 회원인 경우
+            throw new CustomException(ErrorCode.SUSPENDED_USER);
+        }
 
         // 비밀번호 가져오기
         AuthPassword authPassword = authPasswordRepository.findByMemberUser(memberUser)

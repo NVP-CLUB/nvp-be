@@ -34,7 +34,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // 헤더에서 토큰 꺼내기
         String jwt = resolveToken(request);
 
-        // 로그아웃 유무 확인
+        // 블랙리스트 유무 확인
         blackListRepository.findByAccessToken(jwt).ifPresent(blackList -> {
             throw new CustomException(ErrorCode.EXPIRED_TOKEN);
         });
