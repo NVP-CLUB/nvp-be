@@ -42,9 +42,18 @@ public class AuthController {
                 .build();
         headers.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
+        // 클라이언트에 Access Token만 반환 (Refresh Token은 포함하지 않음)
+        TokenDTO responseTokenDTO = TokenDTO.builder()
+                .grantType(tokenDTO.getGrantType())
+                .accessToken(tokenDTO.getAccessToken())
+                .accessTokenExpiresIn(tokenDTO.getAccessTokenExpiresIn())
+                .userRole(tokenDTO.getUserRole())
+                .userNo(tokenDTO.getUserNo())
+                .build();
+
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(new ApiResponse<>(HttpStatus.OK.value(), "Success", tokenDTO));
+                .body(new ApiResponse<>(HttpStatus.OK.value(), "Success", responseTokenDTO));
     }
 
     // 로그아웃
@@ -55,4 +64,5 @@ public class AuthController {
 
         return ApiResponse.success(SecurityUtil.getCurrentUserId());
     }
+
 }
