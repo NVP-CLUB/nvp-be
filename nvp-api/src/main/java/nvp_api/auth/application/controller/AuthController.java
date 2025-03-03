@@ -37,6 +37,7 @@ public class AuthController {
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", tokenDTO.getRefreshToken())
                 .httpOnly(true) // JavaScript에서 접근 불가 (XSS 방어)
                 .secure(false)   // HTTPS에서만 전송 (true / false)
+                .sameSite("Strict")
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7) // 7일 유지
                 .build();
