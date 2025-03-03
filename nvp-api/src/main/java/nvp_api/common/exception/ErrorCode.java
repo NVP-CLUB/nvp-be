@@ -32,6 +32,8 @@ public enum ErrorCode {
      *  FORBIDDEN 403xx
      *  -> 인가 오류 (권한 없음)
      */
+    // 사용자
+    SUSPENDED_USER(40300, HttpStatus.FORBIDDEN, "정지된 회원입니다."),
 
     /**
      *  NOT_FOUND 404xx
@@ -46,6 +48,13 @@ public enum ErrorCode {
     CONFLICT_USERID_EMAIL(40900, HttpStatus.CONFLICT, "이미 가입된 아이디입니다."),
     CONFLICT_USERID_KAKAO(40901, HttpStatus.CONFLICT, "이미 카카오로 가입된 이메일입니다"),
     CONFLICT_USERID_GOOGLE(40902, HttpStatus.CONFLICT, "이미 구글로 가입된 이메일입니다."),
+
+    /**
+     *  GONE 410xx
+     *  -> 이전에는 존재했지만, 지금은 접근 불가능한 상태
+     */
+    // 사용자
+    DELETED_USER(41000, HttpStatus.GONE, "탈퇴된 회원입니다."),
 
     /**
      *  INTERNAL_SERVER_ERROR 500xx

@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 public class Role {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, name = "role_no")
     private Long roleNo;        // 역할 고유 번호
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "role_name")
     private String roleName;        // 역할 명 (USER, ADMIN, MANAGER ...)
 
     // 생성자

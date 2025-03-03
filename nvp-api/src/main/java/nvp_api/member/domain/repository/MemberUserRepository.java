@@ -8,16 +8,6 @@ import java.util.Optional;
 public interface MemberUserRepository {
 
     /**
-     * ======================= 저장 ======================= //
-     */
-
-    // 저장
-    Optional<MemberUser> save(MemberUser memberUser);
-
-    // 전체 저장
-    List<MemberUser> saveAll(List<MemberUser> memberUsers);
-
-    /**
      * ======================= 조회 ======================= //
       */
 
@@ -37,6 +27,4 @@ public interface MemberUserRepository {
     // 삭제
     void delete(MemberUser memberUser);
 
-    // 전체 삭제
-    void deleteAll(List<MemberUser> memberUsers);
 }

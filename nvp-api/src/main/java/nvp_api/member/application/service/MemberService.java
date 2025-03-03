@@ -2,7 +2,7 @@ package nvp_api.member.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nvp_api.auth.application.dto.RegisterMemberDTO;
+import nvp_api.member.application.dto.RegisterMemberDTO;
 import nvp_api.auth.domain.aggregate.AuthPassword;
 import nvp_api.auth.domain.aggregate.MemberAuthentication;
 import nvp_api.auth.infrastructure.repository.JpaAuthPasswordRepository;
@@ -38,16 +38,25 @@ public class MemberService {
 
     // CustomUserDetailsService에서의 SRP를 지키기 위해 UserService로 분리
     public CustomUserDetails loadUserByUsername(String userId) throws UsernameNotFoundException{
-        // 사용자 정보 가져오기
+        // 사용자 가져오기
         MemberUser memberUser = memberUserRepository.findByUserId(userId)
                 .orElseThrow(() -> new UsernameNotFoundException(userId));
 
+        if (memberUser.getStatus().equals(MemberUser.UserStatus.DELETED)){
+            // 탈퇴된 회원인 경우
+            throw new CustomException(ErrorCode.DELETED_USER);
+
+        } else if (memberUser.getStatus().equals(MemberUser.UserStatus.SUSPENDED)){
+            // 정지된 회원인 경우
+            throw new CustomException(ErrorCode.SUSPENDED_USER);
+        }
+
         // 비밀번호 가져오기
-        AuthPassword authPassword = authPasswordRepository.findByUserNo(memberUser.getUserNo())
+        AuthPassword authPassword = authPasswordRepository.findByMemberUser(memberUser)
                 .orElseThrow(() -> new UsernameNotFoundException(userId));
 
         // 권한 가져오기
-        List<MemberRole> allByUserNo = memberRoleRepository.findAllByUserNo(memberUser.getUserNo());
+        List<MemberRole> allByUserNo = memberRoleRepository.findAllByMemberUser(memberUser);
 
         return new CustomUserDetails(memberUser, authPassword, allByUserNo);
     }
@@ -73,7 +82,7 @@ public class MemberService {
 
         // 가입 정보 저장
         MemberUser memberUser = new MemberUser(registerMemberDTO.getUserId(), MemberUser.LoginType.EMAIL);
-        MemberUser save = memberUserRepository.save(memberUser).orElseThrow(() -> new CustomException(ErrorCode.INTERNAL_SERVER_ERROR));
+        MemberUser save = memberUserRepository.save(memberUser);
 
         // 비밀번호 저장
         String encode = bCryptPasswordEncoder.encode(registerMemberDTO.getPassword());
@@ -82,7 +91,7 @@ public class MemberService {
 
         // 사용자 정보 저장
         MemberAuthentication memberAuthentication =
-                new MemberAuthentication(true, registerMemberDTO.getBirthday(), registerMemberDTO.getName(), save);
+                new MemberAuthentication(true, registerMemberDTO.getBirthday(), registerMemberDTO.getName(), save, registerMemberDTO.isMale());
         memberAuthenticationRepository.save(memberAuthentication);
 
         // 사용자 프로필 저장

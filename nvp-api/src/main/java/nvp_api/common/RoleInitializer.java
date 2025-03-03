@@ -22,7 +22,7 @@ public class RoleInitializer implements ApplicationRunner {
         // 사용자 권한 Enum
         for (Role.RoleType roleType : Role.RoleType.values()) {
             // 해당 역할이 있는지 확인
-            roleRepository.findByName(roleType.name()).ifPresentOrElse(
+            roleRepository.findByRoleName(roleType.name()).ifPresentOrElse(
             role -> {
                 log.info("Role found: {}", role.getRoleName() + "존재하는 권한");
             },

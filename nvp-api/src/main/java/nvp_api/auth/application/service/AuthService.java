@@ -3,10 +3,13 @@ package nvp_api.auth.application.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nvp_api.auth.application.dto.LoginMemberDTO;
+import nvp_api.auth.domain.aggregate.RefreshToken;
+import nvp_api.auth.infrastructure.repository.CrudRefreshTokenRepository;
 import nvp_api.common.jwt.TokenDTO;
 import nvp_api.common.jwt.TokenProvider;
+import nvp_api.auth.domain.aggregate.BlackList;
+import nvp_api.auth.infrastructure.repository.CrudBlackListRepository;
 import nvp_api.security.CustomUserDetails;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -23,6 +26,8 @@ public class AuthService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
+    private final CrudBlackListRepository blackListRepository;
+    private final CrudRefreshTokenRepository refreshTokenRepository;
 
     // 일반 로그인
     public TokenDTO memberLogin(LoginMemberDTO loginMemberDTO){
@@ -43,8 +48,26 @@ public class AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        // RefreshToken 저장소에 저장
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                .refreshToken(tokenDTO.getRefreshToken())
+                .userId(loginMemberDTO.getUserId())
+                .build()
+        );
+
         tokenDTO.setUserRole(userRole);
 
         return tokenDTO;
+    }
+
+    // 로그아웃
+    public void memberLogout(String userId, String accessToken){
+        BlackList build = BlackList.builder()
+                .accessToken(accessToken)
+                .userId(userId)
+                .build();
+
+        blackListRepository.save(build);
     }
 }

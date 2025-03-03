@@ -1,25 +1,28 @@
 package nvp_api.member.domain.aggregate;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nvp_api.common.aggregate.entity.BaseCreateUpdateEntity;
 
 /**
  *  사용자 프로필 엔티티
  */
 
+@Getter
 @Entity
 @Table(name = "member_profiles")
 @NoArgsConstructor
-public class MemberProfile {
+public class MemberProfile extends BaseCreateUpdateEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "profile_id")
     private Long profileId;                     // 고유 번호
 
-    @Column(nullable = true)
+    @Column(name = "image_url")
     private String imageUrl;                    // 프로필 사진 (추후에 타입 변경)
 
-    @Column(nullable = true)
+    @Column(name = "member_no")
     private Integer memberNo;                       // 등번호 (nullable이기에 Integer 사용)
 
     @OneToOne

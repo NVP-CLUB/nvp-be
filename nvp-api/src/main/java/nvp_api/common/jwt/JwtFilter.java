@@ -6,6 +6,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nvp_api.common.exception.CustomException;
+import nvp_api.common.exception.ErrorCode;
+import nvp_api.auth.infrastructure.repository.CrudBlackListRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -21,6 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     public static final String JWT_BEARER = "Bearer ";
 
     private final TokenProvider tokenProvider;
+    private final CrudBlackListRepository blackListRepository;
 
     // 실제 필터링 로직은 doFilterInternal 에 들어감
     // JWT 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수행
@@ -30,7 +34,10 @@ public class JwtFilter extends OncePerRequestFilter {
         // 헤더에서 토큰 꺼내기
         String jwt = resolveToken(request);
 
-        // 로그아웃 유무 확인
+        // 블랙리스트 유무 확인
+        blackListRepository.findByAccessToken(jwt).ifPresent(blackList -> {
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+        });
 
         // 토큰 유효성 검사 및 저장
         if (jwt != null && tokenProvider.validateToken(jwt)){
