@@ -36,6 +36,7 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // 토큰 발급 로직
     public TokenDTO generateToken(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
@@ -78,10 +79,36 @@ public class TokenProvider {
                 .build();
     }
 
+    // 토큰 재발급
+    public String reissueAccessToken(String refreshToken) {
+
+        Authentication authentication = getAuthentication(refreshToken);
+
+        // 권한 가져오기
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
+        long now = new Date().getTime();
+
+        // 액세스 제한 시간 생성
+        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+
+        // 새로 생성한 AccessToken 반환
+        return Jwts.builder()                     // payload 예시
+                .setSubject(authentication.getName())           //  "sub" : "userId"
+                .claim("userNo", principal.getUserNo())      // "userNo" : "userNo"
+                .claim(AUTHORITIES_KEY, authorities)            // "auth" : "ROLE_USER, ROLE_GUEST"
+                .setExpiration(accessTokenExpiresIn)            // "exp" : 100000
+                .signWith(key, SignatureAlgorithm.HS512)        // "alg" : "HS512"
+                .compact();
+    }
+
     // 권한
-    public Authentication getAuthentication(String accessToken) {
+    public Authentication getAuthentication(String token) {
         // 토큰 복호화
-        Claims claims = parseClaims(accessToken);
+        Claims claims = parseClaims(token);
         log.info("claims 확인 {}", claims);
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
@@ -95,7 +122,7 @@ public class TokenProvider {
 
         log.info("claims sub {}", claims.getSubject());
         log.info("claims second {}", claims.get("userNo", Long.class));
-        log.info("accessToken 값 확인 {}", accessToken);
+        log.info("accessToken 값 확인 {}", token);
 
         // UsernamePasswordAuthenticationToken에 커스텀 객체 넣기
         TokenSaveDTO principal =
@@ -103,7 +130,7 @@ public class TokenProvider {
                         Long.valueOf(claims.get("userNo").toString())
                         ,claims.getSubject(),
                         authorities,
-                        accessToken
+                        token
                 );
 
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);

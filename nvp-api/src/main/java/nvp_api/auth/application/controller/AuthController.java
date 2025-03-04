@@ -3,10 +3,10 @@ package nvp_api.auth.application.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nvp_api.auth.application.dto.LoginMemberDTO;
 import nvp_api.auth.application.service.AuthService;
 import nvp_api.common.jwt.TokenDTO;
 import nvp_api.common.response.ApiResponse;
-import nvp_api.auth.application.dto.LoginMemberDTO;
 import nvp_api.security.SecurityUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -64,6 +64,23 @@ public class AuthController {
         authService.memberLogout(SecurityUtil.getCurrentUserId(), accessToken);
 
         return ApiResponse.success(SecurityUtil.getCurrentUserId());
+    }
+
+    // 토큰 재발급
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<?>> reissueMember(@CookieValue("refreshToken") String refreshToken){
+
+        String accessToken = authService.reissueToken(refreshToken);
+
+        // 헤더 생성
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.add("Authorization", "Bearer " + accessToken);
+
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ApiResponse<>(HttpStatus.OK.value(), "Success", null));
     }
 
 }
