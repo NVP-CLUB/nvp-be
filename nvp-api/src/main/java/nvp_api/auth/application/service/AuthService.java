@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nvp_api.auth.application.dto.LoginMemberDTO;
 import nvp_api.auth.domain.aggregate.RefreshToken;
 import nvp_api.auth.infrastructure.repository.CrudRefreshTokenRepository;
+import nvp_api.common.exception.CustomException;
 import nvp_api.common.jwt.TokenDTO;
 import nvp_api.common.jwt.TokenProvider;
 import nvp_api.auth.domain.aggregate.BlackList;
@@ -70,4 +71,15 @@ public class AuthService {
 
         blackListRepository.save(build);
     }
+
+    // 토큰 재발급
+    public String reissueToken(String refreshToken){
+
+        // 유효성 검사
+        tokenProvider.validateToken(refreshToken);
+        
+        // 새로 발급된 AccessToken 반환
+        return tokenProvider.reissueAccessToken(refreshToken);
+    }
+
 }

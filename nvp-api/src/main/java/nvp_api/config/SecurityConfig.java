@@ -48,6 +48,7 @@ public class SecurityConfig {
 
                                 // 임시 전체 허용
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/api/v1/auth/reissue").permitAll()    // 토큰 재발급은 필터 제외
                         .requestMatchers("/**").permitAll());
 
         // 시큐리티 자체 로그인, 로그아웃 비활성화
