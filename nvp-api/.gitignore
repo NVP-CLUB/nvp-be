@@ -39,3 +39,4 @@ out/
 ### 추가 ###
 application.yml
 .env
+api-key.properties
