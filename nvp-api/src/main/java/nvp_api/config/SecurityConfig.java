@@ -6,6 +6,7 @@ import nvp_api.common.jwt.TokenProvider;
 import nvp_api.auth.infrastructure.repository.CrudBlackListRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -50,6 +51,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/v1/auth/reissue").permitAll()    // 토큰 재발급은 필터 제외
                         .requestMatchers("/**").permitAll());
+
+        // Oauth 로그인 기능 제공
+        http.oauth2Login(Customizer.withDefaults());
 
         // 시큐리티 자체 로그인, 로그아웃 비활성화
         http.formLogin((AbstractHttpConfigurer::disable));
