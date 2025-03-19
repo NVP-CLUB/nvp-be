@@ -1,6 +1,7 @@
 package nvp_api.config;
 
 import lombok.RequiredArgsConstructor;
+import nvp_api.auth.application.service.CustomOAuth2UserService;
 import nvp_api.common.jwt.JwtFilter;
 import nvp_api.common.jwt.TokenProvider;
 import nvp_api.auth.infrastructure.repository.CrudBlackListRepository;
@@ -28,7 +29,7 @@ public class SecurityConfig {
     private final CrudBlackListRepository blackListRepository;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomOAuth2UserService customOAuth2UserService) throws Exception {
 
         // permitall() => 접근 모두 허용
         // hasRole => 하나의 권한만 접근 가능하게 설정
@@ -53,7 +54,10 @@ public class SecurityConfig {
                         .requestMatchers("/**").permitAll());
 
         // Oauth 로그인 기능 제공
-        http.oauth2Login(Customizer.withDefaults());
+        http.oauth2Login(oauth2 -> {
+            oauth2.userInfoEndpoint(userInfoEndpoint ->
+                userInfoEndpoint.userService(customOAuth2UserService));
+        });
 
         // 시큐리티 자체 로그인, 로그아웃 비활성화
         http.formLogin((AbstractHttpConfigurer::disable));
