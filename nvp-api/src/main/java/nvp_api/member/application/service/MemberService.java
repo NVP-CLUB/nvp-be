@@ -15,6 +15,8 @@ import nvp_api.member.domain.aggregate.MemberUser;
 import nvp_api.member.infrastructure.repository.JpaMemberProfileRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberRoleRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberUserRepository;
+import nvp_api.role.domain.aggregate.Role;
+import nvp_api.role.infrastructure.repository.JpaRoleRepository;
 import nvp_api.security.CustomUserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,7 +34,9 @@ public class MemberService {
     private final JpaMemberAuthenticationRepository memberAuthenticationRepository;
     private final JpaMemberProfileRepository memberProfileRepository;
     private final JpaMemberUserRepository memberUserRepository;
+
     private final JpaMemberRoleRepository memberRoleRepository;
+    private final JpaRoleRepository roleRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -68,10 +72,10 @@ public class MemberService {
         // 해당 이메일로 가입된 정보 확인
         memberUserRepository.findByUserId(registerMemberDTO.getUserId())
                 .ifPresent(user -> {
-                    if (user.getLoginType() == MemberUser.LoginType.KAKAO){
+                    if (user.getLoginType().equals("kakao")){
                         // 카카오 중복 가입
                         throw new CustomException(ErrorCode.CONFLICT_USERID_KAKAO);
-                    } else if (user.getLoginType() == MemberUser.LoginType.GOOGLE) {
+                    } else if (user.getLoginType().equals("google")) {
                         // 구글 중복 가입
                         throw new CustomException(ErrorCode.CONFLICT_USERID_GOOGLE);
                     } else {
@@ -81,24 +85,30 @@ public class MemberService {
                 });
 
         // 가입 정보 저장
-        MemberUser memberUser = new MemberUser(registerMemberDTO.getUserId(), MemberUser.LoginType.EMAIL);
-        MemberUser save = memberUserRepository.save(memberUser);
+        MemberUser save = memberUserRepository.save(new MemberUser(registerMemberDTO.getUserId()));
 
         // 비밀번호 저장
         String encode = bCryptPasswordEncoder.encode(registerMemberDTO.getPassword());
-        AuthPassword authPassword = new AuthPassword(save, encode);
-        authPasswordRepository.save(authPassword);
+        authPasswordRepository.save(new AuthPassword(save, encode));
 
         // 사용자 정보 저장
-        MemberAuthentication memberAuthentication =
-                new MemberAuthentication(true, registerMemberDTO.getBirthday(), registerMemberDTO.getName(), save, registerMemberDTO.isMale());
-        memberAuthenticationRepository.save(memberAuthentication);
+        memberAuthenticationRepository.save(
+                new MemberAuthentication(
+                        registerMemberDTO.getBirthday(), registerMemberDTO.getName(), save, registerMemberDTO.isMale()
+                )
+        );
 
         // 사용자 프로필 저장
-        MemberProfile memberProfile = new MemberProfile(save);
-        memberProfileRepository.save(memberProfile);
+        memberProfileRepository.save(new MemberProfile(save));
 
-        return memberUser.getUserId();
+        // 역할 꺼내기 및 없으면 새로 저장
+        Role guestRole = roleRepository.findByRoleName("GUEST")
+                .orElseGet(() -> roleRepository.save(new Role("GUEST")));
+
+        // 사용자 역할 저장 (기본 게스트)
+        memberRoleRepository.save(new MemberRole(guestRole, save));
+
+        return save.getUserId();
     }
 
 }

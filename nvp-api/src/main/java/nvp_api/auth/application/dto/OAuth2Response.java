@@ -14,4 +14,10 @@ public interface OAuth2Response {
     // 이름
     String getName();
 
+    // 생년월일
+    String getBirthDate();
+
+    // 성별
+    String getGender();
+
 }

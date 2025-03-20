@@ -20,6 +20,9 @@ public interface MemberUserRepository {
     // 로그인 타입별 모두 찾기
     List<MemberUser> findByLoginType(MemberUser.LoginType loginType);
 
+    // username으로 찾기 (provider + "_" + providerId)
+    Optional<MemberUser> findByUsername(String username);
+
     /**
      * ======================= 삭제 ======================= //
      */

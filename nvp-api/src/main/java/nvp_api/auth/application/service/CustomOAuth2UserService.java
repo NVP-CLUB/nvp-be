@@ -1,17 +1,47 @@
 package nvp_api.auth.application.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nvp_api.auth.application.dto.CustomOAuth2User;
 import nvp_api.auth.application.dto.KakaoResponse;
 import nvp_api.auth.application.dto.OAuth2Response;
+import nvp_api.auth.application.dto.UserDTO;
+import nvp_api.auth.domain.aggregate.MemberAuthentication;
+import nvp_api.auth.infrastructure.repository.JpaMemberAuthenticationRepository;
+import nvp_api.common.exception.CustomException;
+import nvp_api.common.exception.ErrorCode;
+import nvp_api.member.domain.aggregate.MemberProfile;
+import nvp_api.member.domain.aggregate.MemberRole;
+import nvp_api.member.domain.aggregate.MemberUser;
+import nvp_api.member.infrastructure.repository.JpaMemberProfileRepository;
+import nvp_api.member.infrastructure.repository.JpaMemberRoleRepository;
+import nvp_api.member.infrastructure.repository.JpaMemberUserRepository;
+import nvp_api.role.domain.aggregate.Role;
+import nvp_api.role.infrastructure.repository.JpaRoleRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    private final JpaMemberUserRepository memberUserRepository;
+    private final JpaMemberAuthenticationRepository memberAuthenticationRepository;
+    private final JpaMemberProfileRepository memberProfileRepository;
+
+    private final JpaMemberRoleRepository memberRoleRepository;
+    private final JpaRoleRepository roleRepository;
+
+    private static final String guest = "GUEST";
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -32,6 +62,65 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return null;
         }
 
+        String username = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId();
+        Optional<MemberUser> byUsername = memberUserRepository.findByUsername(username);
+
+        if (byUsername.isEmpty()) {
+
+            // 사용자 생성
+            MemberUser memberUserSave = memberUserRepository.save(new MemberUser(username, registrationId, oAuth2Response.getProviderId(), oAuth2Response.getEmail()));
+
+            // 사용자 정보 생성
+            memberAuthenticationRepository.save(new MemberAuthentication(LocalDate.parse(oAuth2Response.getBirthDate()), oAuth2Response.getName(), memberUserSave, oAuth2Response.getGender().equals("MALE")));
+
+            // 사용자 프로필 생성
+            memberProfileRepository.save(new MemberProfile(memberUserSave));
+
+            // 역할 꺼내기 및 없으면 새로 저장
+            Role guestRole = roleRepository.findByRoleName(guest)
+                    .orElseGet(() -> roleRepository.save(new Role(guest)));
+
+            // 사용자 역할 저장 (기본 게스트)
+            memberRoleRepository.save(new MemberRole(guestRole, memberUserSave));
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUsername(username);
+            userDTO.setName(oAuth2User.getName());
+            userDTO.setRole(List.of(guestRole));
+
+            return new CustomOAuth2User(userDTO);
+
+        } else {
+
+            MemberUser memberUser = byUsername.get();
+
+            // 정보 변경 시를 대비한 업데이트
+            memberUser.socialUpdateData(oAuth2Response.getEmail());
+            memberUserRepository.save(memberUser);
+
+            // MemberAuthentication 찾기
+            MemberAuthentication memberAuthentication = memberAuthenticationRepository.findByMemberUser(memberUser)
+                    .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_AUTHENTICATION_NOT_FOUND));
+
+            // 업데이트
+            memberAuthentication.socialUpdateMemberAuth(
+                    LocalDate.parse(oAuth2Response.getBirthDate()),
+                    oAuth2Response.getName(),
+                    oAuth2Response.getGender().equals("MALE")
+            );
+            memberAuthenticationRepository.save(memberAuthentication);
+
+            List<MemberRole> allByMemberUser = memberRoleRepository.findAllByMemberUser(memberUser);
+
+            List<Role> allRole = allByMemberUser.stream().map(MemberRole::getRole).toList();
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUsername(username);
+            userDTO.setName(oAuth2User.getName());
+            userDTO.setRole(allRole);
+
+            return new CustomOAuth2User(userDTO);
+        }
 
     }
 }

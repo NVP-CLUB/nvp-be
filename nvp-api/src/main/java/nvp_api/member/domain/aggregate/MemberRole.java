@@ -2,10 +2,12 @@ package nvp_api.member.domain.aggregate;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nvp_api.role.domain.aggregate.Role;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "member_roles")
 public class MemberRole {
 
@@ -20,4 +22,8 @@ public class MemberRole {
     @JoinColumn(name = "user_no", nullable = false)
     private MemberUser memberUser;  // 사용자
 
+    public MemberRole(Role role, MemberUser memberUser) {
+        this.role = role;
+        this.memberUser = memberUser;
+    }
 }

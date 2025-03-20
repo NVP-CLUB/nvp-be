@@ -39,7 +39,7 @@ public enum ErrorCode {
      *  NOT_FOUND 404xx
      *  -> 존재하지 않음
      */
-
+    MEMBER_AUTHENTICATION_NOT_FOUND(40400, HttpStatus.NOT_FOUND, "해당 사용자의 인증 정보가 존재하지 않습니다."),
     /**
      *  CONFLICT 409xx
      *  -> 중복된 사항

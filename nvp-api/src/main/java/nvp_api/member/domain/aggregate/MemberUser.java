@@ -22,11 +22,17 @@ public class MemberUser {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LoginType loginType;                   // 로그인 타입
+    private String loginType;                   // 로그인 타입
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status = UserStatus.ACTIVE;          // 아이디 활동 상태
+
+    @Column
+    private String providerId;                      // 인증 고유 번호
+
+    @Column
+    private String email;                        // 인증 서버 + 인증 고유 번호
 
     @PrePersist
     public void prePersist() {
@@ -35,16 +41,16 @@ public class MemberUser {
         }
 
         if (loginType == null) {
-            loginType = LoginType.EMAIL;
+            loginType = "email";
         }
     }
 
     // 로그인 타입
-    public enum LoginType {
-        KAKAO,     // 카카오 로그인
-        GOOGLE,    // 구글 로그인
-        EMAIL      // 일반 로그인 (이메일)
-    }
+//    public enum LoginType {
+//        KAKAO,     // 카카오 로그인
+//        GOOGLE,    // 구글 로그인
+//        EMAIL      // 일반 로그인 (이메일)
+//    }
 
     // 활동 상태
     public enum UserStatus {
@@ -54,9 +60,22 @@ public class MemberUser {
     }
 
     // 이메일 가입 생성자
-    public MemberUser(String userId, LoginType loginType) {
+    public MemberUser(String userId) {
+        this.userId = userId;
+        this.loginType = "email";
+    }
+
+    // 소셜 계정 생성
+    public MemberUser(String userId, String loginType, String probiderId, String email){
         this.userId = userId;
         this.loginType = loginType;
+        this.providerId = probiderId;
+        this.email = email;
+    }
+
+    // 소셜 로그인시 정보 업데이트
+    public void socialUpdateData(String email) {
+        this.email = email;
     }
 
 }

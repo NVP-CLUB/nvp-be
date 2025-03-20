@@ -1,6 +1,7 @@
 package nvp_api.auth.domain.repository;
 
 import nvp_api.auth.domain.aggregate.MemberAuthentication;
+import nvp_api.member.domain.aggregate.MemberUser;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +28,9 @@ public interface MemberAuthenticationRepository {
 
     // 이름으로 찾기
     List<MemberAuthentication> findAllByName(String name);
+
+    // memberUser로 찾기
+    Optional<MemberAuthentication> findByMemberUser(MemberUser memberUser);
 
     /**
      * ======================= 삭제 ======================= //

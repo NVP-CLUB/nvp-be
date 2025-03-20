@@ -37,8 +37,16 @@ public class KakaoResponse implements OAuth2Response {
     }
 
     // 사용자 생년월일 (ex. 2025-11-30)
+    @Override
     public String getBirthDate(){
 
-        return  (String) attribute.get("birthdate");
+        return (String) attribute.get("birthdate");
+    }
+
+    // 사용자 성별
+    @Override
+    public String getGender(){
+
+        return (String) attribute.get("gender");
     }
 }
