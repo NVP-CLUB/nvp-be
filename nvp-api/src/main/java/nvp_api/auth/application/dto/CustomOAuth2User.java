@@ -1,6 +1,5 @@
 package nvp_api.auth.application.dto;
 
-import nvp_api.member.domain.aggregate.MemberRole;
 import nvp_api.role.domain.aggregate.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,7 +43,13 @@ public class CustomOAuth2User implements OAuth2User {
         return userDTO.getName();
     }
 
+    // provider + "_" + providerId
     public String getUsername(){
         return userDTO.getUsername();
+    }
+
+    // userNo
+    public Long getUserNo(){
+        return userDTO.getUserNo();
     }
 }

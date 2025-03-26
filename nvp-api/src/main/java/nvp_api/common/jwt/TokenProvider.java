@@ -3,6 +3,7 @@ package nvp_api.common.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import nvp_api.auth.application.dto.CustomOAuth2User;
 import nvp_api.common.exception.CustomException;
 import nvp_api.common.exception.ErrorCode;
 import nvp_api.security.CustomUserDetails;
@@ -64,6 +65,49 @@ public class TokenProvider {
         // AccessToken 생성
         String refreshToken = Jwts.builder()                     // payload 예시
                 .setSubject(authentication.getName())           //  "sub" : "userId"
+                .claim("userNo", principal.getUserNo())      // "userNo" : "userNo"
+                .claim(AUTHORITIES_KEY, authorities)            // "auth" : "ROLE_USER, ROLE_GUEST"
+                .setExpiration(refreshTokenExpiresIn)            // "exp" : 100000
+                .signWith(key, SignatureAlgorithm.HS512)        // "alg" : "HS512"
+                .compact();
+
+        return TokenDTO.builder()
+                .grantType(BEARER_TYPE)
+                .accessToken(accessToken)
+                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
+                .refreshToken(refreshToken)
+                .userNo(principal.getUserNo())
+                .build();
+    }
+
+    // 토큰 발급 로직 (소셜 로그인)
+    public TokenDTO generateSocialToken(Authentication authentication) {
+        // 권한 가져오기
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
+        long now = new Date().getTime();
+
+        // 액세스 제한 시간 생성
+        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+
+        // AccessToken 생성
+        String accessToken = Jwts.builder()                     // payload 예시
+                .setSubject(principal.getUsername())           //  "sub" : "userId"
+                .claim("userNo", principal.getUserNo())      // "userNo" : "userNo"
+                .claim(AUTHORITIES_KEY, authorities)            // "auth" : "ROLE_USER, ROLE_GUEST"
+                .setExpiration(accessTokenExpiresIn)            // "exp" : 100000
+                .signWith(key, SignatureAlgorithm.HS512)        // "alg" : "HS512"
+                .compact();
+
+        // 리프레쉬 제한 시간 생성
+        Date refreshTokenExpiresIn = new Date(now + REFRESH_TOKEN_EXPIRE_TIME);
+
+        // AccessToken 생성
+        String refreshToken = Jwts.builder()                     // payload 예시
+                .setSubject(principal.getUsername())           //  "sub" : "userId"
                 .claim("userNo", principal.getUserNo())      // "userNo" : "userNo"
                 .claim(AUTHORITIES_KEY, authorities)            // "auth" : "ROLE_USER, ROLE_GUEST"
                 .setExpiration(refreshTokenExpiresIn)            // "exp" : 100000

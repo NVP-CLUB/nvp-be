@@ -5,6 +5,7 @@ import nvp_api.auth.application.service.CustomOAuth2UserService;
 import nvp_api.common.jwt.JwtFilter;
 import nvp_api.common.jwt.TokenProvider;
 import nvp_api.auth.infrastructure.repository.CrudBlackListRepository;
+import nvp_api.security.oauth.CustomSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -27,9 +28,11 @@ public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
     private final CrudBlackListRepository blackListRepository;
+    private final CustomSuccessHandler customSuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomOAuth2UserService customOAuth2UserService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         // permitall() => 접근 모두 허용
         // hasRole => 하나의 권한만 접근 가능하게 설정
@@ -54,10 +57,11 @@ public class SecurityConfig {
                         .requestMatchers("/**").permitAll());
 
         // Oauth 로그인 기능 제공
-        http.oauth2Login(oauth2 -> {
+        http.oauth2Login(oauth2 ->
             oauth2.userInfoEndpoint(userInfoEndpoint ->
-                userInfoEndpoint.userService(customOAuth2UserService));
-        });
+                userInfoEndpoint.userService(customOAuth2UserService))
+                    .successHandler(customSuccessHandler)
+        );
 
         // 시큐리티 자체 로그인, 로그아웃 비활성화
         http.formLogin((AbstractHttpConfigurer::disable));
@@ -73,8 +77,8 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);                                                                // 쿠키, 인증 정보 포함 허용
-        config.setAllowedOriginPatterns(List.of("*"));                                              // 도메인 전체 허용
-//        config.setAllowedOrigins(List.of("http://localhost:3000"));                                  // 허용 도메인 지정
+//        config.setAllowedOriginPatterns(List.of("*"));                                              // 도메인 전체 허용
+        config.setAllowedOrigins(List.of("http://localhost:5173"));                                  // 허용 도메인 지정
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Refresh-Token"));   // 허용 헤더 제한
         config.setAllowedMethods(List.of("*"));                                                     // HTTP 메서드 전체 허용
 //        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));                               // 허용 HTTP 메서드 제한

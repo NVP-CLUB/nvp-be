@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -63,7 +62,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         String username = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId();
-        Optional<MemberUser> byUsername = memberUserRepository.findByUsername(username);
+        Optional<MemberUser> byUsername = memberUserRepository.findByUserId(username);
 
         if (byUsername.isEmpty()) {
 
@@ -83,7 +82,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             // 사용자 역할 저장 (기본 게스트)
             memberRoleRepository.save(new MemberRole(guestRole, memberUserSave));
 
+            // UserDTO 생성
             UserDTO userDTO = new UserDTO();
+            userDTO.setUserNo(memberUserSave.getUserNo());
             userDTO.setUsername(username);
             userDTO.setName(oAuth2User.getName());
             userDTO.setRole(List.of(guestRole));
@@ -114,7 +115,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             List<Role> allRole = allByMemberUser.stream().map(MemberRole::getRole).toList();
 
+            // UserDTO 생성
             UserDTO userDTO = new UserDTO();
+            userDTO.setUserNo(memberUser.getUserNo());
             userDTO.setUsername(username);
             userDTO.setName(oAuth2User.getName());
             userDTO.setRole(allRole);

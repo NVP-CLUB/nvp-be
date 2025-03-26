@@ -20,7 +20,6 @@ public class MemberUser {
     @Column(nullable = false, unique = true)
     private String userId;                      // 사용자 아이디
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private String loginType;                   // 로그인 타입
 
