@@ -10,6 +10,7 @@ import nvp_api.auth.domain.aggregate.MemberAuthentication;
 import nvp_api.auth.infrastructure.repository.JpaMemberAuthenticationRepository;
 import nvp_api.common.exception.CustomException;
 import nvp_api.common.exception.ErrorCode;
+import nvp_api.common.util.DateTimeUtil;
 import nvp_api.member.domain.aggregate.MemberProfile;
 import nvp_api.member.domain.aggregate.MemberRole;
 import nvp_api.member.domain.aggregate.MemberUser;
@@ -23,8 +24,8 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private static final String guest = "GUEST";
 
+    @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -54,6 +56,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 인증 식별 서버
         if (registrationId.equals("kakao")){
 
+            log.info("registrationId: kakao");
             oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
         } else if (registrationId.equals("google")) {
 
@@ -66,11 +69,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         if (byUsername.isEmpty()) {
 
+            log.info("loginType: {}", registrationId);
+            log.info("username: {}", username);
+            log.info("getProvider: {}", oAuth2Response.getProvider());
+            log.info("getProviderId: {}", oAuth2Response.getProviderId());
+            log.info("getEmail: {}", oAuth2Response.getEmail());
+
             // 사용자 생성
             MemberUser memberUserSave = memberUserRepository.save(new MemberUser(username, registrationId, oAuth2Response.getProviderId(), oAuth2Response.getEmail()));
 
             // 사용자 정보 생성
-            memberAuthenticationRepository.save(new MemberAuthentication(LocalDate.parse(oAuth2Response.getBirthDate()), oAuth2Response.getName(), memberUserSave, oAuth2Response.getGender().equals("MALE")));
+            memberAuthenticationRepository.save(new MemberAuthentication(DateTimeUtil.toLocalDate(oAuth2Response.getBirthDate()), oAuth2Response.getName(), memberUserSave, oAuth2Response.getGender().equals("male")));
 
             // 사용자 프로필 생성
             memberProfileRepository.save(new MemberProfile(memberUserSave));
@@ -105,7 +114,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             // 업데이트
             memberAuthentication.socialUpdateMemberAuth(
-                    LocalDate.parse(oAuth2Response.getBirthDate()),
+                    DateTimeUtil.toLocalDate(oAuth2Response.getBirthDate()),
                     oAuth2Response.getName(),
                     oAuth2Response.getGender().equals("MALE")
             );
