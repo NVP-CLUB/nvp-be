@@ -10,7 +10,6 @@ public interface MemberUserRepository {
     /**
      * ======================= 조회 ======================= //
       */
-
     // 모두 찾기
     List<MemberUser> findAll();
 
@@ -24,10 +23,20 @@ public interface MemberUserRepository {
 //    Optional<MemberUser> findByUsername(String username);
 
     /**
+     * ======================= 생성 ======================= //
+     */
+    // 저장
+    MemberUser save(MemberUser memberUser);
+
+    // 전체 저장
+    List<MemberUser> saveAll(List<MemberUser> memberUsers);
+
+    /**
      * ======================= 삭제 ======================= //
      */
-
     // 삭제
     void delete(MemberUser memberUser);
 
+    // 전체 삭제
+    void deleteAll(List<MemberUser> memberUsers);
 }

@@ -8,7 +8,6 @@ import nvp_api.auth.application.dto.OAuth2Response;
 import nvp_api.auth.application.dto.UserDTO;
 import nvp_api.auth.domain.aggregate.MemberAuthentication;
 import nvp_api.auth.domain.repository.MemberAuthenticationRepository;
-import nvp_api.auth.infrastructure.repository.JpaMemberAuthenticationRepository;
 import nvp_api.common.exception.CustomException;
 import nvp_api.common.exception.ErrorCode;
 import nvp_api.common.util.DateTimeUtil;
@@ -17,13 +16,9 @@ import nvp_api.member.domain.aggregate.MemberRole;
 import nvp_api.member.domain.aggregate.MemberUser;
 import nvp_api.member.domain.repository.MemberProfileRepository;
 import nvp_api.member.domain.repository.MemberRoleRepository;
-import nvp_api.member.infrastructure.repository.JpaMemberProfileRepository;
-import nvp_api.member.infrastructure.repository.JpaMemberRoleRepository;
-import nvp_api.member.infrastructure.repository.JpaMemberUserRepository;
+import nvp_api.member.domain.repository.MemberUserRepository;
 import nvp_api.role.domain.aggregate.Role;
 import nvp_api.role.domain.repository.RoleRepository;
-import nvp_api.role.infrastructure.repository.JpaRoleRepository;
-import nvp_api.role.infrastructure.repository.JpaRoleRepositoryAdapter;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -39,7 +34,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final JpaMemberUserRepository memberUserRepository;
+    private final MemberUserRepository memberUserRepository;
     private final MemberAuthenticationRepository memberAuthenticationRepository;
     private final MemberProfileRepository memberProfileRepository;
 
