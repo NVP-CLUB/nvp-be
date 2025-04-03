@@ -25,7 +25,7 @@ public interface MemberRoleRepository {
     List<MemberRole> findAllByRole(Role role);
 
     /**
-     * ======================= 저장 ======================= //
+     * ======================= 생성 ======================= //
      */
     // 저장
     MemberRole save(MemberRole memberRole);

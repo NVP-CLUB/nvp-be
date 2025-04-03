@@ -17,7 +17,7 @@ public interface RoleRepository {
     Optional<Role> findByRoleNo(long roleNo);
 
     /**
-     * ===저장===
+     * ===생성===
      */
     // 역할 저장
     Role save(Role role);

@@ -14,6 +14,7 @@ import nvp_api.common.util.DateTimeUtil;
 import nvp_api.member.domain.aggregate.MemberProfile;
 import nvp_api.member.domain.aggregate.MemberRole;
 import nvp_api.member.domain.aggregate.MemberUser;
+import nvp_api.member.domain.repository.MemberProfileRepository;
 import nvp_api.member.domain.repository.MemberRoleRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberProfileRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberRoleRepository;
@@ -39,7 +40,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final JpaMemberUserRepository memberUserRepository;
     private final JpaMemberAuthenticationRepository memberAuthenticationRepository;
-    private final JpaMemberProfileRepository memberProfileRepository;
+    private final MemberProfileRepository memberProfileRepository;
 
     private final MemberRoleRepository memberRoleRepository;
     private final RoleRepository roleRepository;

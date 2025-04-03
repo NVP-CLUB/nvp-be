@@ -12,7 +12,6 @@ public interface MemberProfileRepository {
     /**
      * ======================= 조회 ======================= //
      */
-
     // 모두 찾기
     List<MemberProfile> findAll();
 
@@ -29,10 +28,20 @@ public interface MemberProfileRepository {
     List<MemberProfile> findAllByCreatedAt(LocalDateTime registerDate);
 
     /**
+     * ======================= 생성 ======================= //
+     */
+    // 저장
+    MemberProfile save(MemberProfile memberProfile);
+
+    // 전체 저장
+    List<MemberProfile> saveAll(List<MemberProfile> memberProfiles);
+
+    /**
      * ======================= 삭제 ======================= //
      */
-
     // 삭제
     void delete(MemberProfile memberProfile);
 
+    // 전체 삭제
+    void deleteAll(List<MemberProfile> memberProfiles);
 }
