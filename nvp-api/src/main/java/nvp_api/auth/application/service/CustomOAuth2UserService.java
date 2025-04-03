@@ -7,6 +7,7 @@ import nvp_api.auth.application.dto.KakaoResponse;
 import nvp_api.auth.application.dto.OAuth2Response;
 import nvp_api.auth.application.dto.UserDTO;
 import nvp_api.auth.domain.aggregate.MemberAuthentication;
+import nvp_api.auth.domain.repository.MemberAuthenticationRepository;
 import nvp_api.auth.infrastructure.repository.JpaMemberAuthenticationRepository;
 import nvp_api.common.exception.CustomException;
 import nvp_api.common.exception.ErrorCode;
@@ -39,7 +40,7 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final JpaMemberUserRepository memberUserRepository;
-    private final JpaMemberAuthenticationRepository memberAuthenticationRepository;
+    private final MemberAuthenticationRepository memberAuthenticationRepository;
     private final MemberProfileRepository memberProfileRepository;
 
     private final MemberRoleRepository memberRoleRepository;
