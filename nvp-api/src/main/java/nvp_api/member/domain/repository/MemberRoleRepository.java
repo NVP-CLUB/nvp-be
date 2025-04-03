@@ -12,7 +12,6 @@ public interface MemberRoleRepository {
     /**
      * ======================= 조회 ======================= //
      */
-
     // 고유 번호로 찾기
     Optional<MemberRole> findByMemberRoleNo(Long memberRoleNo);
 
@@ -26,10 +25,20 @@ public interface MemberRoleRepository {
     List<MemberRole> findAllByRole(Role role);
 
     /**
+     * ======================= 저장 ======================= //
+     */
+    // 저장
+    MemberRole save(MemberRole memberRole);
+
+    // 전체 저장
+    List<MemberRole> saveAll(List<MemberRole> memberRoles);
+
+    /**
      * ======================= 삭제 ======================= //
      */
-
     // 단일 삭제
     void delete(MemberRole memberRole);
 
+    // 전체 삭제
+    void deleteAll(List<MemberRole> memberRoles);
 }
