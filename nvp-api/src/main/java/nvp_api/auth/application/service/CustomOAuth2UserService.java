@@ -18,7 +18,9 @@ import nvp_api.member.infrastructure.repository.JpaMemberProfileRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberRoleRepository;
 import nvp_api.member.infrastructure.repository.JpaMemberUserRepository;
 import nvp_api.role.domain.aggregate.Role;
+import nvp_api.role.domain.repository.RoleRepository;
 import nvp_api.role.infrastructure.repository.JpaRoleRepository;
+import nvp_api.role.infrastructure.repository.JpaRoleRepositoryAdapter;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -39,13 +41,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final JpaMemberProfileRepository memberProfileRepository;
 
     private final JpaMemberRoleRepository memberRoleRepository;
-    private final JpaRoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     private static final String guest = "GUEST";
 
     @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         log.info("oAuth2User: {}", oAuth2User);

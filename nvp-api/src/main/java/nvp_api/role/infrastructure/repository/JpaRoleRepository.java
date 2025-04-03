@@ -1,10 +1,15 @@
 package nvp_api.role.infrastructure.repository;
 
 import nvp_api.role.domain.aggregate.Role;
-import nvp_api.role.domain.repository.RoleRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JpaRoleRepository extends RoleRepository, JpaRepository<Role, Long> {
+import java.util.Optional;
 
+public interface JpaRoleRepository extends JpaRepository<Role, Long> {
 
+    // 역할 이름 기반 조회
+    Optional<Role> findByRoleName(String roleName);
+    
+    // 역할 조회
+    Optional<Role> findByRoleNo(long roleNo);
 }
