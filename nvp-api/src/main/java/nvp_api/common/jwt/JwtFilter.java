@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,9 +36,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String jwt = resolveToken(request);
 
         // 블랙리스트 유무 확인
-        blackListRepository.findByAccessToken(jwt).ifPresent(blackList -> {
-            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
-        });
+        Optional.ofNullable(blackListRepository.findByAccessToken(jwt))
+                .ifPresent(blackList -> {
+                    throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+                });
 
         // 토큰 유효성 검사 및 저장
         if (jwt != null && tokenProvider.validateToken(jwt)){
